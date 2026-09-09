@@ -1,5 +1,8 @@
+import time
+
 from bs4 import BeautifulSoup
 import requests
+from selenium import webdriver
 
 
 # Standard headers to fetch a website
@@ -15,6 +18,26 @@ def fetch_website_contents(url):
     """
     response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.content, "html.parser")
+    title = soup.title.string if soup.title else "No title found"
+    if soup.body:
+        for irrelevant in soup.body(["script", "style", "img", "input"]):
+            irrelevant.decompose()
+        text = soup.body.get_text(separator="\n", strip=True)
+    else:
+        text = ""
+    return (title + "\n\n" + text)[:2_000]
+
+def fetch_website_contents_with_selenium(url):
+    """
+    Return the title and contents of the website at the given url;
+    truncate to 2,000 characters as a sensible limit
+    """
+    driver = webdriver.Chrome()
+    driver.get(url)
+    time.sleep(10)
+    text = driver.page_source
+    driver.quit()
+    soup = BeautifulSoup(text, "html.parser")
     title = soup.title.string if soup.title else "No title found"
     if soup.body:
         for irrelevant in soup.body(["script", "style", "img", "input"]):
