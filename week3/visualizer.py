@@ -33,6 +33,7 @@ class TokenPredictor:
 
         predictions = []
         for chunk in response:
+            print(chunk.choices[0].delta.content, end="", flush=True)
             if chunk.choices[0].delta.content:
                 token = chunk.choices[0].delta.content
                 logprobs = chunk.choices[0].logprobs.content[0].top_logprobs
