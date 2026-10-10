@@ -19,10 +19,19 @@ def chat(history):
     prior = history[:-1]
     answer, context = answer_question(last_message, prior)
     history.append({"role": "assistant", "content": answer})
-    return history, format_context(context)
+    return [history, format_context(context)]
+
+def simple_chat(message, history):
+    prior = history
+    answer, context = answer_question(message, prior)
+    return answer
 
 
 def main():
+    run_simple_chat = input("Do you want to run the simple chat interface? (y/n): ").strip().lower() == "y"
+    if run_simple_chat:
+        return gr.ChatInterface(simple_chat).launch(inbrowser=True)
+
     def put_message_in_chatbot(message, history):
         return "", history + [{"role": "user", "content": message}]
 
